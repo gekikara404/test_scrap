@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Scrape;
 use App\Products;
+use App\Iphone_prod;
 use Illuminate\Support\Facades\Http;
 use Response;
 use Storage;
@@ -118,6 +119,208 @@ class ScrapeJsonController extends Controller
         //             'price' => $price
         //         ]);
         // }
+    }
+
+    public function soalempat()
+    {
+        $mod = array('16gb','32gb','64gb','128gb','256gb','512gb');
+        $network = array('att', 'factory-unlocked', 'other' , 'sprint','t-mobile','verizon','unlocked(AT&T)','unlocked(Sprint)','unlocked(Verizon)','unlocked(T-Mobile)','unlocked(Other)');
+        // $network = array('att', 'factory-unlocked', 'other' , 'sprint','t-mobile','verizon');
+        $model = array('iphone-se-2020','iphone-iphone-11','iphone-iphone-11-pro','iphone-iphone-11-pro-max','iphone-iphone-xs','iphone-iphone-xs-max','iphone-iphone-xr','iphone-iphone-x','iphone-iphone-8','iphone-iphone-8-plus','7','7-plus','se','6s','6s-plus','6','6-plus','5S','5C','5','4s','4');
+        // $model = array('iphone-iphone-11-pro-max','iphone-iphone-xs','iphone-iphone-xs-max','iphone-iphone-xr','iphone-iphone-x','iphone-iphone-8','iphone-iphone-8-plus','7','7-plus','se','6s','6s-plus','6','6-plus','5S','5C','5','4s','4');
+        $condition = array('used','damaged','new');
+        // $condition = array('new');
+        $condition_last = array('broken','damaged','cracked-glass','fair','normal','new');
+ 
+
+       foreach($condition as $val1){
+
+                foreach($model as $val2){
+
+                    foreach($network as $val3){
+
+                        foreach($mod as $val4){
+
+                            foreach($condition_last as $val5){
+
+                                $url = 'https://sellshark.com/sell/iphone/'.$val1.'/'.$val2.'/'.$val3.'/'.  $val4 . '/'. $val5;
+                                
+                                
+                                $ch = curl_init();
+                                curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+                                curl_setopt($ch, CURLOPT_HEADER, 0);
+                                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                                curl_setopt($ch, CURLOPT_URL, $url);
+                                curl_setopt($ch, CURLOPT_PROXY, '');
+                            
+                                $data = curl_exec($ch);
+                                curl_close($ch);
+
+
+                            
+                                $dom = new \DOMDocument();;
+                                @$dom->loadHTML($data);
+                            
+                                $xpath = new \DOMXPath($dom);
+                            
+                                $datas = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[1]/div/a');
+                                $datas1 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[2]/div/a');
+                                $datas2 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[3]/div/a');
+                                $datas3 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[4]/div/a');
+                                $datas4 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[5]/div/a');
+                                $datas5 = $xpath->query('//*[@id="mydevice"]/div/div/div[2]/div/div/div[1]/span');
+
+                                foreach( $datas as $node )
+                                {
+                                    $device = $node->nodeValue;
+                                }
+                                foreach( $datas1 as $node )
+                                {
+                                    $condition = $node->nodeValue;
+                                }
+                                foreach( $datas2 as $node )
+                                {
+                                    $model = $node->nodeValue;
+                                }
+                                foreach( $datas3 as $node )
+                                {
+                                    $network = $node->nodeValue;
+                                }
+                                foreach( $datas4 as $node )
+                                {
+                                    $size = $node->nodeValue;
+                                }
+                                foreach( $datas5 as $node )
+                                {
+                                    $price = $node->nodeValue;
+                                    $pric = Iphone_prod::where('price',$price)
+                                    ->where('device' , $device)
+                                    ->where('condition',$condition)
+                                    ->where('model',$model)
+                                    ->where('network',$network)
+                                    ->where('size', $size)
+                                    ->first();
+                                }
+                                
+
+
+                                if(!empty($price) &&empty($pric))
+                                {
+                                        Iphone_prod::create([
+                                            'device' => $device,
+                                            'condition' => $condition,
+                                            'model' => $model,
+                                            'network' => $network ,
+                                            'size' => $size,
+                                            'price' => $price
+                                        ]);
+                                    
+                                }
+                                
+                            
+                        }
+
+                    }
+                }
+            }
+        }
+        
+        echo "berhasil";
+        
+    }
+
+    public function test()
+    {
+        // $mod = array('16gb','32gb','64gb','128gb','256gb','512gb');
+        // $network = array('att');
+        // $model = array('iphone-se-2020');
+        
+
+        // $combined = array_map(null,$mod,$network,$model);
+
+        // foreach ($combined as $datas) {
+
+            // $url = 'https://sellshark.com/sell/iphone/used/'. $datas[2] .'/'.$datas[1].'/'.$datas[0];
+            $url = 'https://sellshark.com/sell/iphone/new/iphone-iphone-x/unlocked(AT&T)/64gb/new';
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_PROXY, '');
+        
+            $data = curl_exec($ch);
+            curl_close($ch);
+
+         
+        
+            $dom = new \DOMDocument();;
+            @$dom->loadHTML($data);
+        
+            $xpath = new \DOMXPath($dom);
+        
+            $datas = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[1]/div/a');
+            $datas1 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[2]/div/a');
+            $datas2 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[3]/div/a');
+            $datas3 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[4]/div/a');
+            $datas4 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[5]/div/a');
+            $datas5 = $xpath->query('//*[@id="mydevice"]/div/div/div[2]/div/div/div[1]/span');
+            
+            foreach( $datas as $node )
+            {
+                $device = $node->nodeValue;
+            }
+            foreach( $datas1 as $node )
+            {
+                $condition = $node->nodeValue;
+            }
+            foreach( $datas2 as $node )
+            {
+                $model = $node->nodeValue;
+            }
+            foreach( $datas3 as $node )
+            {
+                $network = $node->nodeValue;
+            }
+            foreach( $datas4 as $node )
+            {
+                $size = $node->nodeValue;
+            }
+            foreach( $datas5 as $node )
+            {
+                $price = $node->nodeValue;
+                $pric = Iphone_prod::where('price',$price)
+                ->where('device' , $device)
+                ->where('condition',$condition)
+                ->where('model',$model)
+                ->where('network',$network)
+                ->where('size', $size)
+                ->first();
+            }
+
+
+
+            
+
+            
+            if(!empty($price) &&empty($pric))
+            {
+                
+                    Iphone_prod::create([
+                        'device' => $device,
+                        'condition' => $condition,
+                        'model' => $model,
+                        'network' => $network ,
+                        'size' => $size,
+                        'price' => $price
+                    ]);
+                
+            }
+
     }
 
 }

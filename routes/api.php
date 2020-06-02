@@ -20,3 +20,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/scarape','ScrapeJsonController@soalsatu');
 Route::get('/scrapexml','ScrapeJsonController@soaldua');
 Route::get('/scrapexmllanjutan','ScrapeJsonController@soaltiga');
+
+Route::get('/scrapesoal4','ScrapeJsonController@soalempat');
+Route::get('/test','ScrapeJsonController@test');
