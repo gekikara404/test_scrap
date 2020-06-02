@@ -1,0 +1,14 @@
+{
+	"productOfferings": [{
+		"products": [{
+			"manufacturer": "Acer",
+			"serviceProvider": "Acer-Generic",
+			"model": "6120 Iconia - Generic"
+		}],
+		"prices": [{
+			"oneTimeCharges": [{
+				"amount": 0.0
+			}]
+		}]
+	}]
+}
