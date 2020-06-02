@@ -13,6 +13,8 @@ class ScrapeSeeder extends Seeder
      */
     public function run()
     {
+        // nyobain data seeder 1 data untuk tampilin function nya bisa di baca di routes sama db nya udah bisa di panggil belum..
+        
         DB::table('scrape')->insert([
             'manufacturer' => Str::random(10),
             'model' => Str::random(10),
