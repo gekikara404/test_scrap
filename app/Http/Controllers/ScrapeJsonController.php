@@ -125,11 +125,8 @@ class ScrapeJsonController extends Controller
     {
         $mod = array('16gb','32gb','64gb','128gb','256gb','512gb');
         $network = array('att', 'factory-unlocked', 'other' , 'sprint','t-mobile','verizon','unlocked(AT&T)','unlocked(Sprint)','unlocked(Verizon)','unlocked(T-Mobile)','unlocked(Other)');
-        // $network = array('att', 'factory-unlocked', 'other' , 'sprint','t-mobile','verizon');
-        $model = array('iphone-se-2020','iphone-iphone-11','iphone-iphone-11-pro','iphone-iphone-11-pro-max','iphone-iphone-xs','iphone-iphone-xs-max','iphone-iphone-xr','iphone-iphone-x','iphone-iphone-8','iphone-iphone-8-plus','7','7-plus','se','6s','6s-plus','6','6-plus','5S','5C','5','4s','4');
-        // $model = array('iphone-iphone-11-pro-max','iphone-iphone-xs','iphone-iphone-xs-max','iphone-iphone-xr','iphone-iphone-x','iphone-iphone-8','iphone-iphone-8-plus','7','7-plus','se','6s','6s-plus','6','6-plus','5S','5C','5','4s','4');
+        $model = array('iphone-se-2020','iphone-iphone-11','iphone-iphone-11-pro','iphone-iphone-11-pro-max','iphone-iphone-xs','iphone-iphone-xs-max','iphone-iphone-xr','iphone-iphone-x','iphone-iphone-8','iphone-iphone-8-plus','7','7-plus','se','6s','6s-plus','6','6-plus','5S','5C','5','4s','4');        
         $condition = array('used','damaged','new');
-        // $condition = array('new');
         $condition_last = array('broken','damaged','cracked-glass','fair','normal','new');
  
 
@@ -168,39 +165,34 @@ class ScrapeJsonController extends Controller
                                 $datas = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[1]/div/a');
                                 $datas1 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[2]/div/a');
                                 $datas2 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[3]/div/a');
-                                $datas3 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[4]/div/a');
                                 $datas4 = $xpath->query('//*[@id="sell-breadcrumbs-nav"]/div/ul/li[5]/div/a');
                                 $datas5 = $xpath->query('//*[@id="mydevice"]/div/div/div[2]/div/div/div[1]/span');
 
                                 foreach( $datas as $node )
                                 {
-                                    $device = $node->nodeValue;
+                                    $a = $node->nodeValue;
                                 }
                                 foreach( $datas1 as $node )
                                 {
-                                    $condition = $node->nodeValue;
+                                    $b = $node->nodeValue;
                                 }
                                 foreach( $datas2 as $node )
                                 {
-                                    $model = $node->nodeValue;
-                                }
-                                foreach( $datas3 as $node )
-                                {
-                                    $network = $node->nodeValue;
+                                    $c = $node->nodeValue;
                                 }
                                 foreach( $datas4 as $node )
                                 {
-                                    $size = $node->nodeValue;
+                                    $e = $node->nodeValue;
                                 }
                                 foreach( $datas5 as $node )
                                 {
                                     $price = $node->nodeValue;
                                     $pric = Iphone_prod::where('price',$price)
-                                    ->where('device' , $device)
-                                    ->where('condition',$condition)
-                                    ->where('model',$model)
-                                    ->where('network',$network)
-                                    ->where('size', $size)
+                                    ->where('device' , $a)
+                                    ->where('condition',$b)
+                                    ->where('model',$c)
+                                    ->where('network',$val3)
+                                    ->where('size', $e)
                                     ->first();
                                 }
                                 
@@ -209,11 +201,11 @@ class ScrapeJsonController extends Controller
                                 if(!empty($price) &&empty($pric))
                                 {
                                         Iphone_prod::create([
-                                            'device' => $device,
-                                            'condition' => $condition,
-                                            'model' => $model,
-                                            'network' => $network ,
-                                            'size' => $size,
+                                            'device' => $a,
+                                            'condition' => $b,
+                                            'model' => $c,
+                                            'network' => $val3 ,
+                                            'size' => $e,
                                             'price' => $price
                                         ]);
                                     
@@ -233,6 +225,33 @@ class ScrapeJsonController extends Controller
 
     public function test()
     {
+        $network = ['att', 'factory-unlocked', 'other' , 'sprint','t-mobile','verizon','unlocked(AT&T)','unlocked(Sprint)','unlocked(Verizon)','unlocked(T-Mobile)','unlocked(Other)'];
+        $model = [
+            'iphone-se-2020' => $network,
+            'iphone-iphone-11' => $network,
+            'iphone-iphone-11-pro' => $network,
+            'iphone-iphone-11-pro-max' => $network,
+            'iphone-iphone-xs' => $network,
+            'iphone-iphone-xs-max' => $network,
+            'iphone-iphone-xr' => $network,
+            'iphone-iphone-x' => $network,
+            'iphone-iphone-8' => $network,
+            'iphone-iphone-8-plus' => $network,
+            '7' => $network,
+            '7-plus' => $network,
+            'se' => $network,
+            '6s' => $network,
+            '6s-plus' => $network,
+            '6','6-plus' => $network,
+            '5S' => $network,
+            '5C' => $network,
+            '5' => $network,
+            '4s' => $network,
+            '4' => $network
+        ];
+
+
+        
         // $mod = array('16gb','32gb','64gb','128gb','256gb','512gb');
         // $network = array('att');
         // $model = array('iphone-se-2020');
@@ -243,13 +262,14 @@ class ScrapeJsonController extends Controller
         // foreach ($combined as $datas) {
 
             // $url = 'https://sellshark.com/sell/iphone/used/'. $datas[2] .'/'.$datas[1].'/'.$datas[0];
-            $url = 'https://sellshark.com/sell/iphone/new/iphone-iphone-x/unlocked(AT&T)/64gb/new';
+            $url = 'https://sellshark.com/sell/iphone/new/iphone-iphone-x/att/64gb';
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_PROXY, '');
         
@@ -320,6 +340,8 @@ class ScrapeJsonController extends Controller
                     ]);
                 
             }
+
+
 
     }
 
